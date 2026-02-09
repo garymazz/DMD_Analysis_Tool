@@ -9,7 +9,7 @@ class CorrectDataController(BaseOperationController):
         description = "Correct Data Window Sizes"
         help_detailed = "Detailed logic for correct_data"
         param_model = CorrectDataParams
-        arguments = [(['--input'], {'help': 'Input file', 'dest': 'input_file'})]
+        arguments = BaseOperationController.arguments_from_model(CorrectDataParams)
 
     def _default(self):
         self.app.console.print("Running correct_data...")

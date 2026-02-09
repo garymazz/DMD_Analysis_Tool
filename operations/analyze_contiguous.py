@@ -9,7 +9,7 @@ class AnalyzeContiguousController(BaseOperationController):
         description = "Analyze Contiguous Blocks"
         help_detailed = "Detailed logic for analyze_contiguous"
         param_model = AnalyzeContiguousParams
-        arguments = [(['--input'], {'help': 'Input file', 'dest': 'input_file'})]
+        arguments = BaseOperationController.arguments_from_model(AnalyzeContiguousParams)
 
     def _default(self):
         self.app.console.print("Running analyze_contiguous...")

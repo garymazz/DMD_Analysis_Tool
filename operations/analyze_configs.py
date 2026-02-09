@@ -9,7 +9,7 @@ class AnalyzeConfigsController(BaseOperationController):
         description = "Analyze Valid Configs"
         help_detailed = "Detailed logic for analyze_configs"
         param_model = AnalyzeConfigsParams
-        arguments = [(['--input'], {'help': 'Input file', 'dest': 'input_file'})]
+        arguments = BaseOperationController.arguments_from_model(AnalyzeConfigsParams)
 
     def _default(self):
         self.app.console.print("Running analyze_configs...")

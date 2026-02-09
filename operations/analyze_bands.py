@@ -9,7 +9,7 @@ class AnalyzeBandsController(BaseOperationController):
         description = "Analyze Error Bands"
         help_detailed = "Detailed logic for analyze_bands"
         param_model = AnalyzeBandsParams
-        arguments = [(['--input'], {'help': 'Input file', 'dest': 'input_file'})]
+        arguments = BaseOperationController.arguments_from_model(AnalyzeBandsParams)
 
     def _default(self):
         self.app.console.print("Running analyze_bands...")

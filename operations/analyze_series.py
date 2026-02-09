@@ -9,7 +9,7 @@ class AnalyzeSeriesController(BaseOperationController):
         description = "Analyze Stack Series"
         help_detailed = "Detailed logic for analyze_series"
         param_model = AnalyzeSeriesParams
-        arguments = [(['--input'], {'help': 'Input file', 'dest': 'input_file'})]
+        arguments = BaseOperationController.arguments_from_model(AnalyzeSeriesParams)
 
     def _default(self):
         self.app.console.print("Running analyze_series...")

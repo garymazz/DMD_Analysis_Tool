@@ -10,10 +10,7 @@ class ReportRowsController(BaseOperationController):
         description = "Report total rows in input file"
         help_detailed = "Performs a raw physical line count."
         param_model = ReportRowsParams
-        arguments = [
-            (['--input'], {'help': 'Input file', 'action': 'store', 'dest': 'input_file'}),
-            (['--no-header'], {'help': 'No header', 'action': 'store_true', 'dest': 'no_header'}),
-        ]
+        arguments = BaseOperationController.arguments_from_model(ReportRowsParams)
 
     def _default(self):
         params = self.get_params()

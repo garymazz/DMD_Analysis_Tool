@@ -1,0 +1,1 @@
+def compute_series_stats(df, min_stack): return df

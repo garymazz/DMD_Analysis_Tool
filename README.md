@@ -1,4 +1,4 @@
-# DMD Analysis Tool (Refactored v34)
+# DMD Analysis Tool
 
 A modular CLI framework built on [Cement](https://builtoncement.com/) and [Pydantic](https://docs.pydantic.dev/) for analyzing DMD system data.
 

@@ -1,6 +1,7 @@
 from cement import App, Controller
 from rich.console import Console
 import sys
+from typing import Any
 
 RICH_CONSOLE = Console()
 
@@ -26,10 +27,76 @@ class DMDFramework(App):
         self.extend('console', RICH_CONSOLE)
 
     def run(self):
+        operation = self._requested_operation_label()
+        if operation and self._is_help_requested():
+            self._print_operation_help(operation)
+            sys.exit(0)
+
         if '--help-detail' in sys.argv:
             self._print_help_logic()
             sys.exit(0)
         super().run()
+
+    @staticmethod
+    def _is_help_requested() -> bool:
+        return any(flag in sys.argv for flag in {'-h', '--help'})
+
+    def _requested_operation_label(self) -> str | None:
+        for token in sys.argv[1:]:
+            if token.startswith('-'):
+                continue
+            return token
+        return None
+
+    def _find_operation_handler(self, label: str):
+        try:
+            handlers = self.handler.list('controller')
+        except Exception:
+            handlers = []
+        for handler in handlers:
+            if getattr(handler.Meta, 'label', None) == label:
+                return handler
+        return None
+
+    def _print_operation_help(self, operation_label: str):
+        operation = self._find_operation_handler(operation_label)
+        if not operation:
+            self.args.print_help()
+            return
+
+        default_argument_lines = [
+            '--debug, -d         full application debug mode',
+            '--quiet, -q         suppress all console output',
+            f'--help, -h          show this help message for {operation_label}',
+        ]
+        app_defined_arguments = self._format_argument_lines(BaseController.Meta.arguments)
+        op_defined_arguments = self._format_argument_lines(getattr(operation.Meta, 'arguments', []))
+
+        self.console.print(f'usage: {sys.argv[0]} {operation_label} [OPTIONS]')
+        description = getattr(operation.Meta, 'description', None)
+        if description:
+            self.console.print(f'\n{description}')
+
+        self.console.print('\noptions:')
+        for line in default_argument_lines + app_defined_arguments + op_defined_arguments:
+            self.console.print(f'  {line}')
+
+    @staticmethod
+    def _format_argument_lines(arguments: list[tuple[list[str], dict[str, Any]]]) -> list[str]:
+        lines: list[str] = []
+        for flags, meta in arguments:
+            if not flags:
+                continue
+            label = ', '.join(flags)
+            description = meta.get('help', 'No description')
+            details = []
+            if meta.get('required'):
+                details.append('required')
+            if meta.get('default') not in {None, ...}:
+                details.append(f"default: {meta['default']}")
+            suffix = f" ({', '.join(details)})" if details else ''
+            lines.append(f'{label:<20} {description}{suffix}')
+        return lines
 
     def _print_help_logic(self):
         self.console.print("[bold underline]DMD Tool Operations Registry[/bold underline]\n")

@@ -3,8 +3,8 @@ from models.analysis_schema import AnalyzeContiguousParams
 
 class AnalyzeContiguousController(BaseOperationController):
     class Meta:
-        label = 'analyze_contiguous'
-        stacked_on = 'base'
+        label = '--analyze_contiguous'
+        stacked_on = '--base'
         stacked_type = 'nested'
         description = "Analyze Contiguous Blocks"
         help_detailed = "Detailed logic for analyze_contiguous"

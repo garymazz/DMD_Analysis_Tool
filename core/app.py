@@ -60,6 +60,7 @@ class DMDFramework(App):
         if '--help-detail' in sys.argv:
             self._print_help_logic()
             sys.exit(0)
+
         super().run()
 
     @staticmethod
@@ -156,9 +157,9 @@ class DMDFramework(App):
             std = getattr(h.Meta, 'description', 'No description')
             detailed = getattr(h.Meta, 'help_detailed', '')
 
-            self.console.print(f"[bold cyan]{label}[/bold cyan]: {std}")
+            self.console.print(f'[bold cyan]{label}[/bold cyan]: {summary}')
             if detailed:
-                self.console.print(f"   [italic]{detailed}[/italic]")
+                self.console.print(f'   [italic]{detailed}[/italic]')
 
             if hasattr(h.Meta, 'param_model') and h.Meta.param_model:
                 try:
@@ -169,24 +170,26 @@ class DMDFramework(App):
                     except Exception:
                         schema = {}
 
-                arguments = getattr(h.Meta, 'arguments', [])
+                arguments = getattr(handler.Meta, 'arguments', [])
                 if arguments:
-                    self.console.print("   [yellow]Options:[/yellow]")
+                    self.console.print('   [yellow]Options:[/yellow]')
                     for option_flags, option_meta in arguments:
-                        option_label = ", ".join(option_flags)
+                        option_label = ', '.join(option_flags)
                         desc = option_meta.get('help')
                         dest = option_meta.get('dest')
                         if not desc and schema and dest in schema:
                             desc = schema[dest].get('description')
                         if not desc:
                             desc = 'No description.'
+
                         details = []
                         if option_meta.get('required'):
-                            details.append("required")
+                            details.append('required')
                         if option_meta.get('default') not in {None, ...}:
                             details.append(f"default: {option_meta['default']}")
                         if option_meta.get('action') in {'store_true', 'store_false'}:
-                            details.append("flag")
-                        suffix = f" ({', '.join(details)})" if details else ""
-                        self.console.print(f"      {option_label}: {desc}{suffix}")
-            self.console.print("")
+                            details.append('flag')
+                        suffix = f" ({', '.join(details)})" if details else ''
+                        self.console.print(f'      {option_label}: {desc}{suffix}')
+
+            self.console.print('')

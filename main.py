@@ -11,10 +11,17 @@ from operations.analyze_configs import AnalyzeConfigsController
 from operations.analyze_contiguous import AnalyzeContiguousController
 from operations.correct_data import CorrectDataController
 
-# Register Controllers
-for c in [ReportRowsController, AnalyzeSeriesController, AnalyzeBandsController, 
-          AnalyzeConfigsController, AnalyzeContiguousController, CorrectDataController]:
-    DMDFramework.Meta.handlers.append(c)
+# Register controllers once to avoid duplicate handler registration on repeated imports
+for controller in [
+    ReportRowsController,
+    AnalyzeSeriesController,
+    AnalyzeBandsController,
+    AnalyzeConfigsController,
+    AnalyzeContiguousController,
+    CorrectDataController,
+]:
+    if controller not in DMDFramework.Meta.handlers:
+        DMDFramework.Meta.handlers.append(controller)
 
 def main():
     with DMDFramework() as app:

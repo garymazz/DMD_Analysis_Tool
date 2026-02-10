@@ -85,6 +85,12 @@ class DMDFramework(App):
                 labels.add(label)
         return labels
 
+        for token in sys.argv[1:]:
+            if token.startswith('-'):
+                continue
+            return token
+        return None
+
     def _find_operation_handler(self, label: str):
         try:
             handlers = self.handler.list('controller')

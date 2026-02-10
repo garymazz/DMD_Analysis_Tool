@@ -9,8 +9,8 @@ class BaseOperationController(Controller):
     """
     class Meta:
         # This is just a base class, not a registered handler itself
-        label = 'base_op'
-        stacked_on = 'base'
+        label = '--base_op'
+        stacked_on = '--base'
         stacked_type = 'nested'
 
         # Custom fields for our "registry" help

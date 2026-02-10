@@ -5,9 +5,10 @@ from typing import Any
 
 RICH_CONSOLE = Console()
 
+
 class BaseController(Controller):
     class Meta:
-        label = 'base'
+        label = '--base'
         description = "DMD Analysis Tool v34 (Refactored)"
         arguments = [
             (['--help-detail'], {'help': 'Show detailed parameter registry', 'action': 'store_true'}),
@@ -16,15 +17,39 @@ class BaseController(Controller):
     def _default(self):
         self.app.args.print_help()
 
+
 class DMDFramework(App):
     class Meta:
-        label = 'dmd_tool'
+        label = '--dmd_tool'
         handlers = [BaseController]
         exit_on_close = True
 
     def setup(self):
         super().setup()
         self.extend('console', RICH_CONSOLE)
+        self._register_operation_arguments()
+
+    def _register_operation_arguments(self):
+        """Register operation flags via Cement's add_argument() API."""
+        args_parser = getattr(self, 'args', None)
+        if not args_parser or not hasattr(args_parser, 'add_argument'):
+            return
+
+        try:
+            handlers = self.handler.list('controller')
+        except Exception:
+            handlers = []
+
+        for handler in handlers:
+            label = getattr(handler.Meta, 'label', None)
+            if not label or label in {'--base', '--base_op'}:
+                continue
+            help_text = getattr(handler.Meta, 'description', f'Run {label}')
+            try:
+                args_parser.add_argument(label, help=help_text, action='store_true')
+            except Exception:
+                # Ignore parser conflicts from pre-registered arguments.
+                pass
 
     def run(self):
         operation = self._requested_operation_label()
@@ -42,6 +67,24 @@ class DMDFramework(App):
         return any(flag in sys.argv for flag in {'-h', '--help'})
 
     def _requested_operation_label(self) -> str | None:
+        known_labels = self._operation_labels()
+        for token in sys.argv[1:]:
+            if token in known_labels:
+                return token
+        return None
+
+    def _operation_labels(self) -> set[str]:
+        try:
+            handlers = self.handler.list('controller')
+        except Exception:
+            handlers = []
+        labels: set[str] = set()
+        for handler in handlers:
+            label = getattr(handler.Meta, 'label', None)
+            if label and label not in {'--base', '--base_op'}:
+                labels.add(label)
+        return labels
+
         for token in sys.argv[1:]:
             if token.startswith('-'):
                 continue
@@ -100,18 +143,16 @@ class DMDFramework(App):
 
     def _print_help_logic(self):
         self.console.print("[bold underline]DMD Tool Operations Registry[/bold underline]\n")
-        # We need to look for controllers that are stacked on base
-        try: 
-            # In Cement 3, handlers are registered by type. We want 'controller'.
+        try:
             handlers = self.handler.list('controller')
-        except: handlers = []
+        except Exception:
+            handlers = []
 
         for h in handlers:
-            # Skip the base controller itself
-            if h.Meta.label == 'base': continue
+            if h.Meta.label in {'--base'}:
+                continue
 
             label = getattr(h.Meta, 'label', 'Unknown')
-            # Use 'description' as standard help
             std = getattr(h.Meta, 'description', 'No description')
             detailed = getattr(h.Meta, 'help_detailed', '')
 
@@ -120,10 +161,13 @@ class DMDFramework(App):
                 self.console.print(f"   [italic]{detailed}[/italic]")
 
             if hasattr(h.Meta, 'param_model') and h.Meta.param_model:
-                try: schema = h.Meta.param_model.model_json_schema()['properties']
-                except: 
-                    try: schema = h.Meta.param_model.schema()['properties']
-                    except: schema = {}
+                try:
+                    schema = h.Meta.param_model.model_json_schema()['properties']
+                except Exception:
+                    try:
+                        schema = h.Meta.param_model.schema()['properties']
+                    except Exception:
+                        schema = {}
 
                 arguments = getattr(h.Meta, 'arguments', [])
                 if arguments:

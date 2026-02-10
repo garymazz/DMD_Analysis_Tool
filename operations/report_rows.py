@@ -4,8 +4,8 @@ from models.analysis_schema import ReportRowsParams
 
 class ReportRowsController(BaseOperationController):
     class Meta:
-        label = 'report_rows'
-        stacked_on = 'base'
+        label = '--report_rows'
+        stacked_on = '--base'
         stacked_type = 'nested'
         description = "Report total rows in input file"
         help_detailed = "Performs a raw physical line count."

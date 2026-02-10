@@ -109,7 +109,7 @@ from lib import filters  # Import reusable logic
 
 class MyNewOpController(BaseOperationController):
     class Meta:
-        label = 'my_new_op'
+        label = '--my_new_op'
         description = "Short summary of the op."
         help_detailed = "Longer explanation of what logic is applied."
         param_model = MyNewOpParams

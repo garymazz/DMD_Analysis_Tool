@@ -3,8 +3,8 @@ from models.analysis_schema import CorrectDataParams
 
 class CorrectDataController(BaseOperationController):
     class Meta:
-        label = 'correct_data'
-        stacked_on = 'base'
+        label = '--correct_data'
+        stacked_on = '--base'
         stacked_type = 'nested'
         description = "Correct Data Window Sizes"
         help_detailed = "Detailed logic for correct_data"
